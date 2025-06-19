@@ -84,28 +84,32 @@ const createCardComponent = (title, image, body) => {
 };
 
 let currentPage = 1;
-let pageSize = 20;
+let pageSize = 25;
 let lastElement = null;
 let charactersList = [];
 let AnimeList = [];
+let has_next_page = false;
 const callAnimeList = async () => {
-  container.innerHTML = "";
-  showSkeletons(20);
-  fetch("https://api.jikan.moe/v4/top/anime")
+  showSkeletons(25);
+  fetch(`https://api.jikan.moe/v4/top/anime?page=${currentPage}`)
     .then((res) => res.json())
     .then((data) => {
       charactersList = data.data;
-      const page = paginate(charactersList, pageSize, currentPage);
+      console.log(data.data);
+      if (data.pagination) has_next_page = data.pagination.has_next_page;
+      const page = charactersList;
+      console.log(pageSize, currentPage);
       renderData(page);
       removeSkeletons();
     });
 };
 const callCharactersList = async (maId) => {
-  showSkeletons(20);
+  showSkeletons(25);
   //NS:1735  DS:38000
   fetch(`https://api.jikan.moe/v4/anime/${maId}/characters`)
     .then((res) => res.json())
     .then((data) => {
+      isAnimeList = false;
       charactersList = data.data;
       const page = paginate(charactersList, pageSize, currentPage);
       removeSkeletons();
@@ -118,12 +122,20 @@ const callCharactersList = async (maId) => {
 const observeCallback = (entries, observer) => {
   if (entries[0].isIntersecting) {
     currentPage++;
-    if ((currentPage - 1) * pageSize < charactersList.length) {
-      const page = paginate(charactersList, pageSize, currentPage);
-      observer.unobserve(lastElement);
-      renderData(page);
+    if (isAnimeList) {
+      if (has_next_page) {
+        console.log("Hello");
+        console.log(charactersList.length);
+        callAnimeList();
+      }
     } else {
-      observer.disconnect();
+      if ((currentPage - 1) * pageSize < charactersList.length) {
+        const page = paginate(charactersList, pageSize, currentPage);
+        observer.unobserve(lastElement);
+        renderData(page);
+      } else {
+        observer.disconnect();
+      }
     }
   }
 };
@@ -139,7 +151,7 @@ const renderData = async (characters) => {
       item.character ? item.character.name : item.title,
       item.character
         ? item.character.images.webp.image_url
-        : item.images.webp.image_url,
+        : item.images.webp.large_image_url || item.images.webp.image_url,
       item.role
     );
     if (index == characters.length - 1) {
@@ -162,7 +174,7 @@ const renderData = async (characters) => {
           name: item.character ? item.character.name : item.title,
           image: item.character
             ? item.character.images.webp.image_url
-            : item.images.webp.image_url,
+            : item.images.webp.large_image_url || item.images.webp.image_url,
           role: item.role,
         });
     });
@@ -181,6 +193,8 @@ window.addEventListener("popstate", (event) => {
   if (event.state?.animeId) {
     callCharactersList(event.state.animeId);
   } else {
+    isAnimeList = true;
+    container.innerHTML = "";
     callAnimeList();
   }
 });
