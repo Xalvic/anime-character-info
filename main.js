@@ -124,8 +124,7 @@ const observeCallback = (entries, observer) => {
     currentPage++;
     if (isAnimeList) {
       if (has_next_page) {
-        console.log("Hello");
-        console.log(charactersList.length);
+        observer.unobserve(lastElement);
         callAnimeList();
       }
     } else {
