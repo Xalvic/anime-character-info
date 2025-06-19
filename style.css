@@ -1,0 +1,141 @@
+@layer reset {
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+}
+@layer layout {
+  body {
+    font-family: "Poppins", sans-serif;
+  }
+  main {
+    display: flex;
+    flex-direction: column;
+  }
+  .char-list {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem;
+    padding-bottom: 6rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+  }
+}
+@layer components {
+  .skeleton .shimmer {
+    background: #eee;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 37%, #f0f0f0 63%);
+    animation: shimmer 2.2s infinite linear;
+    background-size: 1000px 100%;
+    border-radius: 4px;
+  }
+
+  .image.shimmer {
+    width: 100%;
+    height: 200px;
+  }
+
+  .title.shimmer,
+  .role.shimmer {
+    height: 16px;
+    margin: 10px 0;
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: -1000px 0;
+    }
+    100% {
+      background-position: 1000px 0;
+    }
+  }
+
+  .card {
+    .image {
+      cursor: pointer;
+      overflow: hidden;
+      background: #eee;
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 37%, #f0f0f0 63%);
+      aspect-ratio: 9 / 14;
+      /* height: 150px; */
+      border-radius: 12px;
+    }
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scale(1.01);
+      transform-origin: center;
+      transition: transform 0.3s ease, filter 0.3s ease;
+    }
+    .image:hover img {
+      filter: brightness(1.1) contrast(1.1) saturate(1.1);
+      transform: scale(1.05);
+    }
+    .title {
+      font-size: 1.1rem;
+      text-align: center;
+    }
+    .role {
+      font-size: 0.8rem;
+    }
+  }
+
+  /* Blurred background when modal is open */
+  body.modal-open main {
+    filter: blur(6px);
+    transition: filter 0.4s ease;
+  }
+
+  /* Modal base styling */
+  #modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: grid;
+    place-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+    z-index: 999;
+  }
+
+  #modal-overlay.modal-visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  #modal-content {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    width: 100%;
+    /* min-height: 50vh; */
+    max-width: 90vw;
+    max-height: 90vh;
+    text-align: center;
+    position: relative;
+    transform-origin: center center;
+    transition: transform 0.4s ease;
+    overflow: auto;
+    clip-path: polygon(8% 15%, 8% 15%, 8% 85%, 8% 85%);
+    transition: clip-path 0.4s ease;
+    @media only screen and (min-width: 1200px) {
+      max-width: 1000px;
+    }
+  }
+  #modal-overlay.modal-visible #modal-content {
+    clip-path: polygon(100% 0, 0 0, 0 100%, 100% 100%);
+  }
+
+  #modal-image {
+    width: 200px;
+    height: auto;
+    border-radius: 8px;
+    object-fit: cover;
+    margin-bottom: 1rem;
+  }
+}
